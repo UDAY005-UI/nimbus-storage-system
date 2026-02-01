@@ -1,5 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
@@ -14,6 +15,12 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2022"
+    "target": "ES2022",
+
+    "paths": {
+      "@repo/common/*": ["packages/common/src/*"],
+      "@repo/auth/*": ["packages/auth/src/*"],
+      "@repo/storage-client/*": ["packages/storage-client/src/*"]
+    }
   }
 }

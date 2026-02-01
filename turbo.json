@@ -2,20 +2,53 @@
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
   "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "check-types": {
-      "dependsOn": ["^check-types"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
+        "build": {
+            "dependsOn": ["^build"],
+            "inputs": ["$TURBO_DEFAULT$", ".env*"],
+            "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+        },
+        "api-gateway#build": {
+            "dependsOn": ["^build"],
+            "env": [],
+            "cache": false
+        },
+        "metadata-service#build": {
+            "dependsOn": ["^build"],
+            "env": [],
+            "cache": false
+        },
+        "upload-service#build": {
+            "dependsOn": ["^build"],
+            "env": [],
+            "cache": false
+        },
+        "worker-service#build": {
+            "dependsOn": ["^build"],
+            "env": [],
+            "cache": false
+        },
+        "web#build": {
+            "dependsOn": ["^build"],
+            "env": [],
+            "cache": false
+        },
+        "lint": {
+            "dependsOn": ["^lint"]
+        },
+        "check-types": {
+            "dependsOn": ["^check-types"]
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true
+        },
+        "start": {
+            "cache": false,
+            "persistent": true
+        },
+        "start:dev": {
+            "cache": false,
+            "persistent": true
+        }
     }
-  }
 }
