@@ -1,9 +1,107 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
   moduleFormat = "cjs"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+
+enum UploadStatus {
+  INITIATED
+  UPLOADING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  buckets Bucket[]
+  objects Object[]
+  uploads Upload[]
+
+  @@map("users")
+}
+
+model Bucket {
+  id        String   @id @default(uuid()) @db.Uuid
+  ownerId   String   @map("owner_id") @db.Uuid
+  name      String   @db.VarChar(63)
+  region    String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  owner   User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  objects Object[]
+
+  @@unique([ownerId, name])
+  @@map("buckets")
+}
+
+model Object {
+  id        String   @id @default(uuid()) @db.Uuid
+  bucketId  String   @map("bucket_id") @db.Uuid
+  ownerId   String   @map("owner_id") @db.Uuid
+  objectKey String   @map("object_key") @db.VarChar(1024)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  bucket   Bucket          @relation(fields: [bucketId], references: [id], onDelete: Cascade)
+  owner    User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  versions ObjectVersion[]
+  uploads  Upload[]
+
+  @@unique([bucketId, objectKey])
+  @@map("objects")
+}
+
+model ObjectVersion {
+  id            String   @id @default(uuid()) @db.Uuid
+  objectId      String   @map("object_id") @db.Uuid
+  versionNumber Int      @map("version_number")
+  sizeBytes     BigInt   @map("size_bytes")
+  checksum      String?  @db.VarChar(64)
+  storagePath   String   @map("storage_path") @db.VarChar(1024)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  object Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+
+  @@unique([objectId, versionNumber])
+  @@map("object_versions")
+}
+
+model Upload {
+  id                String       @id @default(uuid()) @db.Uuid
+  objectId          String       @db.Uuid @map("object_id")
+  initiatedByUserId String       @db.Uuid @map("initiated_by_user_id")
+  state             UploadStatus @default(INITIATED)
+  totalChunks       Int          @map("total_chunks")
+  chunkSize         BigInt       @map("chunk_size")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  completedAt       DateTime?    @map("completed_at")
+
+  object Object        @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [initiatedByUserId], references: [id], onDelete: Cascade)
+  chunks UploadChunk[]
+
+  @@map("uploads")
+}
+
+model UploadChunk {
+  id         String   @id @default(uuid()) @db.Uuid
+  uploadId   String   @db.Uuid @map("upload_id")
+  chunkIndex Int      @map("chunk_index")
+  sizeBytes  BigInt   @map("size_bytes")
+  checksum   String?  @db.VarChar(64)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  upload Upload @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+
+  @@unique([uploadId, chunkIndex])
+  @@map("upload_chunks")
 }
