@@ -16,11 +16,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022",
-
-    "paths": {
-      "@repo/common/*": ["packages/common/src/*"],
-      "@repo/auth/*": ["packages/auth/src/*"],
-      "@repo/storage-client/*": ["packages/storage-client/src/*"]
-    }
-  }
+    "outDir": "dist"
+  },
+  "include": ["src/*.ts"]
 }
