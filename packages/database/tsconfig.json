@@ -5,5 +5,9 @@
     "target": "ES2023",
     "strict": true,
     "esModuleInterop": true,
-  }
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true,
+  },
+  "include": ["src/*.ts"]
 }
